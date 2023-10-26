@@ -6,7 +6,6 @@
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="get:\pokemon:api-pokemon-config" doc:id="393397a1-02cf-450e-b288-cdd1e7346901" >
-		<logger level="INFO" doc:name="Logger" doc:id="9e37cec1-8cd9-4eec-bc43-f796e6dd3ca9" message="get:\pokemon:api-pokemon-config" />
 		<set-variable value="#[randomInt(490) as String]" doc:name="Random" doc:id="c9b79bd5-5821-42fd-b5c2-4441ee5d31e3" variableName="Random" />
 		<http:request method="GET" doc:name="Request" doc:id="0c6b942f-b636-4a72-a667-cfc84782c8aa" config-ref="HTTP_Request_configuration" path='#["/api/v2/pokemon/" ++ vars.Random]' />
 		<ee:transform doc:name="Transform Message" doc:id="6f525239-e5e8-4135-acc0-bdf3e021bd0e" >
@@ -20,5 +19,6 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9e37cec1-8cd9-4eec-bc43-f796e6dd3ca9" message="get:\pokemon:api-pokemon-config" />
 	</flow>
 </mule>

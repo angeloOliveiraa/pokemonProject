@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="d82e9a5a-5815-4732-b559-358abe29808c" >
+		<db:mssql-connection host="localhost" port="1433" user="angelo" password="angelo" databaseName="db-pokemon"/>
+	</db:config>
 	<flow name="get:\pokemon:api-pokemon-config" doc:id="393397a1-02cf-450e-b288-cdd1e7346901" >
+		<scheduler doc:name="Scheduler" doc:id="0b754930-5c08-40a5-944d-e9ea2bc9831d" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="1" timeUnit="SECONDS"/>
+			</scheduling-strategy>
+		</scheduler>
 		<set-variable value="#[randomInt(490) as String]" doc:name="Random" doc:id="c9b79bd5-5821-42fd-b5c2-4441ee5d31e3" variableName="Random" />
 		<http:request method="GET" doc:name="Request" doc:id="0c6b942f-b636-4a72-a667-cfc84782c8aa" config-ref="HTTP_Request_configuration" path='#["/api/v2/pokemon/" ++ vars.Random]' />
 		<ee:transform doc:name="Transform Message" doc:id="6f525239-e5e8-4135-acc0-bdf3e021bd0e" >
@@ -19,6 +28,13 @@ output application/json
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<db:insert doc:name="Insert" doc:id="8f82ef2d-5fad-48fe-80a4-54c2ef2a68b3" config-ref="Database_Config">
+			<db:sql ><![CDATA[INSERT INTO tbPokemon(nome)
+VALUES (:nome)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+nome: payload.Nome
+}]]]></db:input-parameters>
+		</db:insert>
 		<logger level="INFO" doc:name="Logger" doc:id="9e37cec1-8cd9-4eec-bc43-f796e6dd3ca9" message="get:\pokemon:api-pokemon-config" />
 	</flow>
 </mule>
